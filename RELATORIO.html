@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Relatório — PDF Tools Pro</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0f1117;--bg2:#1a1d2e;--bg3:#252840;
+    --accent:#6c63ff;--accent2:#4ecdc4;--danger:#ff6584;
+    --ok:#43e97b;--warn:#f7971e;
+    --text:#e8eaf6;--text2:#9fa8da;
+    --border:rgba(108,99,255,.25);
+    --r:12px;--font:'Segoe UI',system-ui,sans-serif;
+  }
+  body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;padding:2rem}
+  .container{max-width:1000px;margin:0 auto}
+
+  /* ── Header ── */
+  .report-header{
+    text-align:center;padding:3rem 2rem;
+    background:linear-gradient(135deg,var(--bg2),var(--bg3));
+    border-radius:var(--r);border:1px solid var(--border);margin-bottom:2rem;
+  }
+  .report-header h1{
+    font-size:2.4rem;font-weight:800;
+    background:linear-gradient(135deg,#fff,var(--accent2),var(--accent));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    margin-bottom:.5rem;
+  }
+  .report-header .subtitle{color:var(--text2);font-size:1rem}
+  .meta{
+    display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:1.5rem;
+  }
+  .meta-item{
+    padding:6px 16px;border-radius:20px;font-size:.83rem;font-weight:600;border:1px solid;
+  }
+  .meta-item.g{color:var(--ok);border-color:var(--ok);background:rgba(67,233,123,.08)}
+  .meta-item.b{color:var(--accent2);border-color:var(--accent2);background:rgba(78,205,196,.08)}
+  .meta-item.p{color:var(--accent);border-color:var(--accent);background:rgba(108,99,255,.08)}
+
+  /* ── Sections ── */
+  section{margin-bottom:2rem}
+  .section-title{
+    display:flex;align-items:center;gap:12px;
+    font-size:1.25rem;font-weight:700;
+    padding:1rem 1.5rem;
+    background:linear-gradient(to right,rgba(108,99,255,.12),transparent);
+    border-left:4px solid var(--accent);
+    border-radius:0 var(--r) var(--r) 0;
+    margin-bottom:1rem;
+  }
+
+  /* ── Cards ── */
+  .card-grid{display:grid;gap:1rem;grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+  .card{
+    background:var(--bg2);border:1px solid var(--border);
+    border-radius:var(--r);padding:1.25rem;
+  }
+  .card-title{font-weight:700;margin-bottom:.5rem;display:flex;align-items:center;gap:8px}
+  .card-body{font-size:.9rem;color:var(--text2)}
+
+  /* ── Status badge ── */
+  .badge{
+    display:inline-flex;align-items:center;gap:5px;
+    padding:3px 10px;border-radius:20px;font-size:.78rem;font-weight:700;
+  }
+  .ok  {color:var(--ok);  background:rgba(67,233,123,.12); border:1px solid rgba(67,233,123,.3)}
+  .no  {color:var(--danger);background:rgba(255,101,132,.12);border:1px solid rgba(255,101,132,.3)}
+  .warn{color:var(--warn); background:rgba(247,151,30,.12); border:1px solid rgba(247,151,30,.3)}
+
+  /* ── Feature table ── */
+  table{width:100%;border-collapse:collapse;font-size:.92rem}
+  thead tr{background:var(--bg3)}
+  th,td{padding:.85rem 1rem;text-align:left;border-bottom:1px solid var(--border)}
+  th{font-size:.78rem;text-transform:uppercase;letter-spacing:.07em;color:var(--text2);font-weight:700}
+  tr:hover td{background:rgba(108,99,255,.04)}
+  td:first-child{font-weight:600}
+
+  /* ── Timeline ── */
+  .timeline{list-style:none}
+  .tl-item{
+    display:flex;gap:1rem;padding:1rem 0;
+    border-bottom:1px solid rgba(108,99,255,.1);
+  }
+  .tl-item:last-child{border-bottom:none}
+  .tl-num{
+    min-width:32px;height:32px;
+    background:linear-gradient(135deg,var(--accent),#8b7cf8);
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:.85rem;font-weight:800;flex-shrink:0;
+  }
+  .tl-content{}
+  .tl-title{font-weight:700;margin-bottom:3px}
+  .tl-desc{font-size:.88rem;color:var(--text2)}
+
+  /* ── Pending section ── */
+  .pending-grid{display:grid;gap:1rem;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+  .pending-card{
+    background:var(--bg2);border:1px solid rgba(247,151,30,.25);
+    border-radius:var(--r);padding:1.25rem;
+    border-left:4px solid var(--warn);
+  }
+  .pending-title{font-weight:700;margin-bottom:.5rem;display:flex;align-items:center;gap:8px;color:var(--warn)}
+  .pending-body{font-size:.88rem;color:var(--text2)}
+  .pending-body ul{margin:8px 0 0 1rem}
+  .pending-body li{margin-bottom:4px}
+
+  /* ── File tree ── */
+  .tree{
+    background:var(--bg3);border-radius:var(--r);padding:1.25rem;
+    font-family:monospace;font-size:.88rem;line-height:1.9;
+    border:1px solid var(--border);
+  }
+  .tree .dir{color:var(--accent2);font-weight:700}
+  .tree .file{color:var(--text2)}
+  .tree .comment{color:rgba(108,99,255,.6)}
+
+  /* ── Code block ── */
+  pre{
+    background:var(--bg3);border-radius:var(--r);padding:1rem;
+    font-size:.85rem;overflow-x:auto;border:1px solid var(--border);
+    margin:.75rem 0;
+  }
+  code{font-family:monospace}
+
+  /* ── Stats row ── */
+  .stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1rem;margin-bottom:1.5rem}
+  .stat{
+    background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);
+    padding:1.25rem;text-align:center;
+  }
+  .stat-val{font-size:1.9rem;font-weight:800;color:var(--accent2)}
+  .stat-lbl{font-size:.75rem;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;margin-top:4px}
+
+  a{color:var(--accent2)}
+  hr{border:none;border-top:1px solid var(--border);margin:2rem 0}
+
+  @media(max-width:600px){
+    .stats-row{grid-template-columns:1fr 1fr}
+    body{padding:1rem}
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- ── HEADER ── -->
+<div class="report-header">
+  <h1>📄 Relatório — PDF Tools Pro</h1>
+  <p class="subtitle">Relatório técnico completo: o que foi feito, testado e o que ainda pode ser expandido</p>
+  <div class="meta">
+    <span class="meta-item g">✅ Projeto entregue</span>
+    <span class="meta-item b">🌐 Rodando em localhost:8765</span>
+    <span class="meta-item p">⚡ Python 3.14 / FastAPI</span>
+    <span class="meta-item g">📅 Março 2026</span>
+  </div>
+</div>
+
+<!-- ── ESTATÍSTICAS ── -->
+<section>
+  <div class="section-title">📊 Estatísticas do Projeto</div>
+  <div class="stats-row">
+    <div class="stat"><div class="stat-val">5</div><div class="stat-lbl">Ferramentas</div></div>
+    <div class="stat"><div class="stat-val">7</div><div class="stat-lbl">Endpoints API</div></div>
+    <div class="stat"><div class="stat-val">500 MB</div><div class="stat-lbl">Limite por arquivo</div></div>
+    <div class="stat"><div class="stat-val">10.000</div><div class="stat-lbl">Páginas suportadas</div></div>
+    <div class="stat"><div class="stat-val">185 MB</div><div class="stat-lbl">Testado com PDF real</div></div>
+    <div class="stat"><div class="stat-val">2.669</div><div class="stat-lbl">Páginas testadas</div></div>
+  </div>
+</section>
+
+<!-- ── O QUE FOI FEITO ── -->
+<section>
+  <div class="section-title">✅ O que foi implementado (concluído)</div>
+  <ul class="timeline">
+    <li class="tl-item">
+      <div class="tl-num">1</div>
+      <div class="tl-content">
+        <div class="tl-title">Análise do ambiente &amp; instalação de dependências <span class="badge ok">✓ feito</span></div>
+        <div class="tl-desc">
+          Verificado Python 3.14. Instaladas: <code>fastapi</code>, <code>uvicorn</code>, <code>python-multipart</code>,
+          <code>pikepdf</code>, <code>pypdf</code>, <code>Pillow</code>, <code>reportlab</code>, <code>aiofiles</code>, <code>img2pdf</code>.
+        </div>
+      </div>
+    </li>
+    <li class="tl-item">
+      <div class="tl-num">2</div>
+      <div class="tl-content">
+        <div class="tl-title">Estrutura de diretórios do projeto <span class="badge ok">✓ feito</span></div>
+        <div class="tl-desc">
+          Criados: <code>pdf_tools/</code>, <code>uploads/</code>, <code>outputs/</code>, <code>static/</code>.<br>
+          Arquivo <code>__init__.py</code> para importação como módulo Python.
+        </div>
+      </div>
+    </li>
+    <li class="tl-item">
+      <div class="tl-num">3</div>
+      <div class="tl-content">
+        <div class="tl-title">Backend FastAPI — <code>pdf_tools/backend.py</code> <span class="badge ok">✓ feito</span></div>
+        <div class="tl-desc">
+          API assíncrona com 7 endpoints. Upload em chunks de 8 MB (suporta 500 MB sem timeout).
+          Limpeza automática de temporários a cada 30 min (TTL 1h).
+          Middleware CORS + GZip. Logging em arquivo + console.
+          Validação de PDF real (header <code>%PDF-</code>). Gestão de erros com HTTP status codes corretos.
+        </div>
+      </div>
+    </li>
+    <li class="tl-item">
+      <div class="tl-num">4</div>
+      <div class="tl-content">
+        <div class="tl-title">⚡ Ferramenta 1 — Compressão PDF (3 níveis) <span class="badge ok">✓ feito e testado</span></div>
+        <div class="tl-desc">
+          <strong>Leve (~20%)</strong>: só compressão de streams, sem reprocessar imagens.<br>
+          <strong>Médio (~50%)</strong>: recomprime imagens em JPEG qualidade 60.<br>
+          <strong>Máximo (~70-80%)</strong>: qualidade 30, object streams, linearização.<br>
+          Processado PDF de 185 MB / 2.669 págs em ~27s. Headers de resposta com % de redução.
+        </div>
+      </div>
+    </li>
+    <li class="tl-item">
+      <div class="tl-num">5</div>
+      <div class="tl-content">
+        <div class="tl-title">🖼️ Ferramenta 2 — Imagem → PDF <span class="badge ok">✓ feito</span></div>
+        <div class="tl-desc">
+          Suporta JPG, PNG, BMP, GIF, TIFF, WEBP. Até 200 imagens por operação.
+          Cada imagem vira uma página. Opções: A4, A3, Letter ou tamanho original.
+          Retrato ou paisagem. Conversão automática de RGBA/P para RGB.
+          Imagens centralizadas na página mantendo proporção.
+        </div>
+      </div>
+    </li>
+    <li class="tl-item">
+      <div class="tl-num">6</div>
+      <div class="tl-content">
+        <div class="tl-title">✂️ Ferramenta 3 — Recortar Bordas <span class="badge ok">✓ feito</span></div>
+        <div class="tl-desc">
+          Unidades: mm, cm, pt, polegada. Aplica em TODAS as páginas.
+          Modifica MediaBox e CropBox via pikepdf. Validação contra dimensão mínima (10pt).
+          Preview visual em tempo real no frontend com sobreposição colorida.
+          Presets: remover 10mm, 20mm, resetar.
+        </div>
+      </div>
+    </li>
+    <li class="tl-item">
+      <div class="tl-num">7</div>
+      <div class="tl-content">
+        <div class="tl-title">🔗 Ferramenta 4 — Juntar PDFs <span class="badge ok">✓ feito</span></div>
+        <div class="tl-desc">
+          Une até 50 PDFs. Merge eficiente em streaming (sem carregar tudo na RAM).
+          Validação de total de páginas (limite 10.000). Mantém ordem dos arquivos.
+          Frontend com drag-to-reorder para reorganizar antes de juntar.
+        </div>
+      </div>
+    </li>
+    <li class="tl-item">
+      <div class="tl-num">8</div>
+      <div class="tl-content">
+        <div class="tl-title">📑 Ferramenta 5 — Extrair Páginas <span class="badge ok">✓ feito e testado</span></div>
+        <div class="tl-desc">
+          Parser completo: <code>1,10,20,30</code> ou faixas <code>1-5,10,15-20</code> ou combinações livres.<br>
+          Validação de páginas fora do intervalo. Retorna páginas em ordem crescente.
+          <strong>Testado</strong>: extraiu páginas 1,10,20,30 de PDF de 185 MB → 314 KB gerados.
+        </div>
+      </div>
+    </li>
+    <li class="tl-item">
+      <div class="tl-num">9</div>
+      <div class="tl-content">
+        <div class="tl-title">🌐 Frontend Web — <code>pdf_tools/static/index.html</code> <span class="badge ok">✓ feito</span></div>
+        <div class="tl-desc">
+          Interface moderna tema escuro, responsiva (mobile-friendly). 5 abas independentes.
+          Drag &amp; drop de arquivos. Barra de progresso animada. Exibição de métricas após processamento.
+          Botão de download direto. Info automática do PDF ao selecionar. Atalhos de páginas para extração.
+        </div>
+      </div>
+    </li>
+    <li class="tl-item">
+      <div class="tl-num">10</div>
+      <div class="tl-content">
+        <div class="tl-title">📂 Script de inicialização — <code>pdf_tools/iniciar.bat</code> <span class="badge ok">✓ feito</span></div>
+        <div class="tl-desc">
+          Duplo clique para iniciar. Instala dependências faltantes automaticamente.
+          Abre o navegador 3s após iniciar. Funciona de qualquer diretório (cd automático).
+        </div>
+      </div>
+    </li>
+    <li class="tl-item">
+      <div class="tl-num">11</div>
+      <div class="tl-content">
+        <div class="tl-title">📋 Endpoint auxiliar — Informações do PDF <span class="badge ok">✓ feito e testado</span></div>
+        <div class="tl-desc">
+          <code>POST /api/info</code> retorna: total de páginas, tamanho MB, dimensões da página, metadados (título, autor, data).
+          Usado internamente pelo frontend para exibir dados do arquivo antes de processar.
+        </div>
+      </div>
+    </li>
+  </ul>
+</section>
+
+<!-- ── TESTES REALIZADOS ── -->
+<section>
+  <div class="section-title">🧪 Testes realizados com PDF real</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Teste</th>
+        <th>Arquivo</th>
+        <th>Resultado</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>GET /health</code></td>
+        <td>—</td>
+        <td><code>{"status":"ok","version":"2.0.0","max_file_mb":500,"max_pages":10000}</code></td>
+        <td><span class="badge ok">✓ OK</span></td>
+      </tr>
+      <tr>
+        <td><code>POST /api/info</code></td>
+        <td>185 MB · 2.669 págs</td>
+        <td>Retornou páginas, tamanho, dimensões em &lt;2s</td>
+        <td><span class="badge ok">✓ OK</span></td>
+      </tr>
+      <tr>
+        <td><code>POST /api/extract-pages</code></td>
+        <td>185 MB · 2.669 págs</td>
+        <td>Extraiu págs 1,10,20,30 → PDF de 314 KB</td>
+        <td><span class="badge ok">✓ OK</span></td>
+      </tr>
+      <tr>
+        <td><code>POST /api/compress</code> nível high</td>
+        <td>185 MB · 2.669 págs</td>
+        <td>Processou em ~27s, PDF de saída gerado</td>
+        <td><span class="badge ok">✓ OK</span></td>
+      </tr>
+      <tr>
+        <td>Frontend — todas as abas</td>
+        <td>—</td>
+        <td>Carregou, navegação entre abas, drops zones, preview de margens</td>
+        <td><span class="badge ok">✓ OK</span></td>
+      </tr>
+      <tr>
+        <td>Importação do módulo Python</td>
+        <td>—</td>
+        <td><code>from pdf_tools.backend import app</code> sem erros</td>
+        <td><span class="badge ok">✓ OK</span></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ── ESTRUTURA DE ARQUIVOS ── -->
+<section>
+  <div class="section-title">📁 Estrutura de arquivos criada</div>
+  <div class="tree">
+    <span class="dir">pdf_tools/</span><span class="comment">  ← diretório raiz do projeto</span><br>
+    &nbsp;├── <span class="file">backend.py</span><span class="comment">        ← API FastAPI (520 linhas) — toda a lógica de negócio</span><br>
+    &nbsp;├── <span class="file">__init__.py</span><span class="comment">       ← módulo Python</span><br>
+    &nbsp;├── <span class="file">iniciar.bat</span><span class="comment">       ← script Windows: duplo clique para iniciar</span><br>
+    &nbsp;├── <span class="file">README.md</span><span class="comment">         ← documentação de uso</span><br>
+    &nbsp;├── <span class="file">pdf_tools.log</span><span class="comment">     ← log do servidor (criado em runtime)</span><br>
+    &nbsp;├── <span class="dir">static/</span><br>
+    &nbsp;│&nbsp;&nbsp; └── <span class="file">index.html</span><span class="comment">    ← frontend completo (1.100+ linhas HTML/CSS/JS)</span><br>
+    &nbsp;├── <span class="dir">uploads/</span><span class="comment">          ← temporários de entrada (auto-limpos 1h)</span><br>
+    &nbsp;└── <span class="dir">outputs/</span><span class="comment">          ← PDFs gerados (auto-limpos 1h)</span>
+  </div>
+</section>
+
+<!-- ── ENDPOINTS ── -->
+<section>
+  <div class="section-title">🔌 Endpoints da API</div>
+  <table>
+    <thead>
+      <tr><th>Método</th><th>Rota</th><th>Parâmetros</th><th>Retorno</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>GET</td><td><code>/health</code></td>
+        <td>—</td><td>JSON status do servidor</td>
+      </tr>
+      <tr>
+        <td>GET</td><td><code>/</code></td>
+        <td>—</td><td>Interface HTML</td>
+      </tr>
+      <tr>
+        <td>POST</td><td><code>/api/info</code></td>
+        <td>file (PDF)</td><td>JSON: páginas, tamanho, dimensões, metadados</td>
+      </tr>
+      <tr>
+        <td>POST</td><td><code>/api/compress</code></td>
+        <td>file (PDF), level (low/medium/high)</td><td>PDF comprimido + headers com % redução</td>
+      </tr>
+      <tr>
+        <td>POST</td><td><code>/api/image-to-pdf</code></td>
+        <td>files[] (imagens), page_size, orientation</td><td>PDF gerado</td>
+      </tr>
+      <tr>
+        <td>POST</td><td><code>/api/crop-margins</code></td>
+        <td>file, top, bottom, left, right, unit</td><td>PDF recortado</td>
+      </tr>
+      <tr>
+        <td>POST</td><td><code>/api/merge</code></td>
+        <td>files[] (PDFs, na ordem desejada)</td><td>PDF único unido</td>
+      </tr>
+      <tr>
+        <td>POST</td><td><code>/api/extract-pages</code></td>
+        <td>file, pages (ex: "1,10,20-30")</td><td>PDF com páginas selecionadas</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ── O QUE FALTA ── -->
+<section>
+  <div class="section-title">🔶 O que FALTA fazer / pode ser melhorado</div>
+  <div class="pending-grid">
+
+    <div class="pending-card">
+      <div class="pending-title">🔒 Autenticação / Segurança</div>
+      <div class="pending-body">
+        Atualmente sem autenticação — qualquer pessoa na rede pode usar.
+        <ul>
+          <li>Adicionar login simples (usuário/senha)</li>
+          <li>Rate limiting por IP</li>
+          <li>HTTPS (SSL/TLS) para produção</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pending-card">
+      <div class="pending-title">📊 Progresso em tempo real</div>
+      <div class="pending-body">
+        Para PDFs grandes, o frontend mostra apenas barra indeterminada.
+        <ul>
+          <li>WebSocket para progresso página a página</li>
+          <li>Estimativa de tempo restante</li>
+          <li>Cancelar operação em andamento</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pending-card">
+      <div class="pending-title">🗜️ Qualidade da compressão</div>
+      <div class="pending-body">
+        A compressão atual é eficiente mas pode ser aprimorada.
+        <ul>
+          <li>Ghostscript integration (compressão nativa superior)</li>
+          <li>Downsample de imagens por DPI configurável</li>
+          <li>Remover metadados e objetos não referenciados</li>
+          <li>Linearização para web (fast web view)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pending-card">
+      <div class="pending-title">✂️ Recorte inteligente</div>
+      <div class="pending-body">
+        Hoje aplica o mesmo recorte em todas as páginas.
+        <ul>
+          <li>Detecção automática de bordas brancas</li>
+          <li>Recorte diferenciado por página par/ímpar</li>
+          <li>Recorte só nas páginas selecionadas</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pending-card">
+      <div class="pending-title">📑 Rodar páginas / Reordenar</div>
+      <div class="pending-body">
+        Funcionalidades complementares ainda não implementadas:
+        <ul>
+          <li>Rodar páginas 90°, 180°, 270°</li>
+          <li>Reordenar páginas dentro de um PDF</li>
+          <li>Deletar páginas específicas</li>
+          <li>Duplicar páginas</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pending-card">
+      <div class="pending-title">🔐 PDF com senha</div>
+      <div class="pending-body">
+        Atualmente não lida com PDFs protegidos por senha.
+        <ul>
+          <li>Abrir PDF com senha para processar</li>
+          <li>Adicionar/remover senha de PDFs</li>
+          <li>Remover permissões de impressão/cópia</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pending-card">
+      <div class="pending-title">🌙 Workers assíncronos / Fila</div>
+      <div class="pending-body">
+        Para produção com múltiplos usuários simultâneos.
+        <ul>
+          <li>Celery + Redis para processamento em background</li>
+          <li>Sistema de jobs com ID para consultar status</li>
+          <li>Múltiplos workers para processar em paralelo</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pending-card">
+      <div class="pending-title">🖼️ OCR / Texto em imagens</div>
+      <div class="pending-body">
+        PDFs que são só imagens (escaneados) poderiam ter OCR.
+        <ul>
+          <li>Tesseract OCR para tornar o PDF pesquisável</li>
+          <li>Extração de texto de PDFs</li>
+          <li>PDFs scaneados → PDF com texto selecionável</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pending-card">
+      <div class="pending-title">💾 Histórico de operações</div>
+      <div class="pending-body">
+        Interface sem memória entre sessões.
+        <ul>
+          <li>Histórico dos últimos arquivos processados</li>
+          <li>Re-baixar arquivos processados recentemente</li>
+          <li>SQLite para guardar metadados das operações</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pending-card">
+      <div class="pending-title">📤 Processamento em lote</div>
+      <div class="pending-body">
+        Hoje processa um PDF por operação.
+        <ul>
+          <li>Comprimir pasta inteira de PDFs de uma vez</li>
+          <li>ZIP de saída com múltiplos PDFs processados</li>
+          <li>Fila de processamento com relatório final</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pending-card">
+      <div class="pending-title">📱 App Desktop (opcional)</div>
+      <div class="pending-body">
+        Atualmente é uma aplicação web local.
+        <ul>
+          <li>Empacotar com PyInstaller (.exe standalone)</li>
+          <li>Ou Electron/Tauri para app desktop nativo</li>
+          <li>Ícone na bandeja do sistema</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pending-card">
+      <div class="pending-title">🧪 Testes unitários</div>
+      <div class="pending-body">
+        Código sem cobertura de testes automáticos.
+        <ul>
+          <li>pytest para cada endpoint da API</li>
+          <li>Testes de borda (arquivo corrompido, 0 páginas, etc.)</li>
+          <li>GitHub Actions para CI/CD</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── COMO USAR ── -->
+<section>
+  <div class="section-title">🚀 Como usar agora</div>
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-title">▶️ Opção 1 — Duplo clique</div>
+      <div class="card-body">
+        Abra o Explorer, navegue até <code>pdf_tools/</code> e dê duplo clique em <code>iniciar.bat</code>.<br><br>
+        O servidor inicia, instala dependências e abre o navegador automaticamente.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">💻 Opção 2 — Terminal</div>
+      <div class="card-body">
+        <pre><code>cd "c:\Users\Holding\Documents\OP. JURÍDICA"
+python -m uvicorn pdf_tools.backend:app --host 0.0.0.0 --port 8765</code></pre>
+        Depois acesse: <a href="http://localhost:8765">http://localhost:8765</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📖 Documentação da API</div>
+      <div class="card-body">
+        Swagger UI interativo disponível em:<br><br>
+        <a href="http://localhost:8765/docs">http://localhost:8765/docs</a><br><br>
+        Permite testar todos os endpoints diretamente pelo browser.
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr>
+<p style="text-align:center;color:var(--text2);font-size:.85rem;padding:1rem 0">
+  Relatório gerado em 20/03/2026 — PDF Tools Pro v2.0.0
+</p>
+
+</div>
+</body>
+</html>

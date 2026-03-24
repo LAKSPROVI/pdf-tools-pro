@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PDF Tools Pro — Ferramenta Completa de PDF</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>" />
+  <style>
+    /* ── Reset & Base ──────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f1117;
+      --bg2: #1a1d2e;
+      --bg3: #252840;
+      --accent: #6c63ff;
+      --accent2: #4ecdc4;
+      --accent3: #ff6584;
+      --text: #e8eaf6;
+      --text2: #9fa8da;
+      --border: rgba(108,99,255,0.25);
+      --shadow: 0 4px 32px rgba(108,99,255,0.18);
+      --radius: 14px;
+      --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      --success: #43e97b;
+      --warn: #f7971e;
+      --danger: #ff6584;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Header ────────────────────────────────────────────────────────── */
+    header {
+      background: linear-gradient(135deg, #1a1d2e 0%, #252840 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 68px;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+    .logo-text { font-size: 1.4rem; font-weight: 700; color: var(--text); }
+    .logo-badge {
+      font-size: 0.7rem;
+      background: var(--accent);
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 600;
+      margin-left: 4px;
+    }
+
+    nav { display: flex; gap: 4px; }
+    nav a {
+      color: var(--text2);
+      text-decoration: none;
+      font-size: 0.9rem;
+      padding: 6px 14px;
+      border-radius: 8px;
+      transition: all .2s;
+    }
+    nav a:hover { color: var(--text); background: rgba(108,99,255,.15); }
+
+    /* ── Hero ──────────────────────────────────────────────────────────── */
+    .hero {
+      text-align: center;
+      padding: 72px 2rem 48px;
+      background: radial-gradient(ellipse at 50% 0%, rgba(108,99,255,.15) 0%, transparent 70%);
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff 0%, var(--accent2) 50%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.15;
+      margin-bottom: 1rem;
+    }
+    .hero p {
+      font-size: 1.15rem;
+      color: var(--text2);
+      max-width: 600px;
+      margin: 0 auto 2.5rem;
+    }
+    .hero-badges {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      border: 1px solid;
+    }
+    .badge.green { color: var(--success); border-color: var(--success); background: rgba(67,233,123,.08); }
+    .badge.blue  { color: var(--accent2); border-color: var(--accent2); background: rgba(78,205,196,.08); }
+    .badge.purple{ color: var(--accent);  border-color: var(--accent);  background: rgba(108,99,255,.08); }
+
+    /* ── Tabs ──────────────────────────────────────────────────────────── */
+    .tabs-wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem 4rem;
+    }
+    .tab-nav {
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      margin-bottom: 2rem;
+      scrollbar-width: thin;
+    }
+    .tab-btn {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: var(--radius);
+      border: 1px solid transparent;
+      background: var(--bg2);
+      color: var(--text2);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .22s;
+      font-family: var(--font);
+    }
+    .tab-btn .tab-icon { font-size: 1.1rem; }
+    .tab-btn:hover { color: var(--text); background: var(--bg3); border-color: var(--border); }
+    .tab-btn.active {
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent), #8b7cf8);
+      border-color: transparent;
+      box-shadow: 0 4px 20px rgba(108,99,255,.4);
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ── Tool Card ─────────────────────────────────────────────────────── */
+    .tool-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .tool-header {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: linear-gradient(to right, rgba(108,99,255,.08), transparent);
+    }
+    .tool-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+    .tool-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 3px; }
+    .tool-desc  { font-size: 0.875rem; color: var(--text2); }
+    .tool-body  { padding: 2rem; }
+
+    /* ── Drop Zone ─────────────────────────────────────────────────────── */
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 3rem 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all .25s;
+      background: rgba(108,99,255,.04);
+      position: relative;
+    }
+    .drop-zone:hover,
+    .drop-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(108,99,255,.1);
+      transform: translateY(-1px);
+    }
+    .drop-icon  { font-size: 2.5rem; margin-bottom: .75rem; }
+    .drop-title { font-size: 1.05rem; font-weight: 600; margin-bottom: .35rem; }
+    .drop-sub   { font-size: 0.83rem; color: var(--text2); }
+    .drop-zone input[type=file] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer;
+    }
+
+    /* File list */
+    .file-list { margin-top: 1rem; }
+    .file-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      background: var(--bg3);
+      border-radius: 8px;
+      margin-bottom: 6px;
+      font-size: 0.86rem;
+    }
+    .file-item .fi-icon { font-size: 1.1rem; flex-shrink: 0; }
+    .file-item .fi-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .file-item .fi-size { color: var(--text2); white-space: nowrap; }
+    .file-item .fi-del  {
+      background: none; border: none; color: var(--danger);
+      cursor: pointer; font-size: 1rem; padding: 2px 6px; border-radius: 4px;
+      transition: background .15s;
+    }
+    .file-item .fi-del:hover { background: rgba(255,101,132,.15); }
+
+    /* ── Form Controls ─────────────────────────────────────────────────── */
+    .form-row {
+      display: grid;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+    .form-row.cols-2 { grid-template-columns: 1fr 1fr; }
+    .form-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .form-row.cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+    label {
+      display: block;
+      font-size: 0.83rem;
+      font-weight: 600;
+      color: var(--text2);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    input[type=text],
+    input[type=number],
+    select {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.92rem;
+      font-family: var(--font);
+      transition: border-color .2s;
+      -webkit-appearance: none;
+    }
+    input[type=text]:focus,
+    input[type=number]:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(108,99,255,.2);
+    }
+    select option { background: var(--bg2); }
+
+    /* Level selector */
+    .level-select {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .level-btn {
+      flex: 1;
+      min-width: 80px;
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: var(--bg3);
+      color: var(--text2);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all .2s;
+      font-family: var(--font);
+    }
+    .level-btn:hover { border-color: var(--accent); color: var(--text); }
+    .level-btn.selected {
+      border-color: var(--accent);
+      background: rgba(108,99,255,.2);
+      color: var(--text);
+      box-shadow: 0 0 0 2px rgba(108,99,255,.25);
+    }
+    .level-btn .lv-icon { font-size: 1.3rem; display: block; margin-bottom: 3px; }
+    .level-btn .lv-name { font-size: .78rem; }
+
+    /* ── Buttons ───────────────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 28px;
+      border-radius: 10px;
+      border: none;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .22s;
+      font-family: var(--font);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #8b7cf8);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(108,99,255,.4);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(108,99,255,.5);
+    }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .btn-full { width: 100%; justify-content: center; }
+
+    /* ── Progress ──────────────────────────────────────────────────────── */
+    .progress-wrapper {
+      margin-top: 1.5rem;
+      display: none;
+    }
+    .progress-wrapper.visible { display: block; }
+    .progress-bar-track {
+      height: 6px;
+      background: var(--bg3);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transition: width .3s;
+      width: 0%;
+    }
+    .progress-bar-fill.indeterminate {
+      width: 40% !important;
+      animation: progressAnim 1.4s ease-in-out infinite;
+    }
+    @keyframes progressAnim {
+      0%   { transform: translateX(-120%); }
+      100% { transform: translateX(350%); }
+    }
+    .progress-text {
+      font-size: 0.83rem;
+      color: var(--text2);
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    /* ── Alert / Result ────────────────────────────────────────────────── */
+    .alert {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 18px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      margin-top: 1.5rem;
+      line-height: 1.5;
+    }
+    .alert.hidden { display: none; }
+    .alert-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+    .alert.success { background: rgba(67,233,123,.1); border: 1px solid rgba(67,233,123,.3); color: #a8f5c2; }
+    .alert.error   { background: rgba(255,101,132,.1); border: 1px solid rgba(255,101,132,.3); color: #ffb3c1; }
+    .alert.info    { background: rgba(108,99,255,.1);  border: 1px solid rgba(108,99,255,.3);  color: #c5c0ff; }
+
+    .result-box {
+      background: var(--bg3);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+      display: none;
+    }
+    .result-box.visible { display: block; }
+    .result-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+    .stat-item {
+      text-align: center;
+      padding: 1rem;
+      background: var(--bg2);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    .stat-value { font-size: 1.4rem; font-weight: 800; color: var(--accent2); }
+    .stat-label { font-size: 0.76rem; color: var(--text2); margin-top: 4px; text-transform: uppercase; letter-spacing: .05em; }
+
+    .download-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--success) 0%, #00b09b 100%);
+      color: #fff;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.95rem;
+      transition: all .2s;
+    }
+    .download-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(67,233,123,.3); }
+
+    /* ── PDF info panel ────────────────────────────────────────────────── */
+    .info-panel {
+      background: var(--bg3);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+      border: 1px solid var(--border);
+      display: none;
+    }
+    .info-panel.visible { display: block; }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: .75rem;
+    }
+    .info-item { }
+    .info-key   { font-size: .75rem; color: var(--text2); text-transform: uppercase; letter-spacing: .05em; }
+    .info-val   { font-size: .95rem; font-weight: 600; color: var(--text); }
+
+    /* ── Margin visual ─────────────────────────────────────────────────── */
+    .margin-preview {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin: 1.5rem 0;
+    }
+    .mp-row { display: flex; align-items: center; gap: 8px; }
+    .mp-page {
+      width: 100px;
+      height: 130px;
+      background: #fff;
+      border-radius: 4px;
+      border: 2px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .mp-crop-overlay {
+      position: absolute;
+      background: rgba(108,99,255,.35);
+      transition: all .25s;
+    }
+    .mp-top    { top:0; left:0; right:0; height: 0; }
+    .mp-bottom { bottom:0; left:0; right:0; height: 0; }
+    .mp-left   { left:0; top:0; bottom:0; width: 0; }
+    .mp-right  { right:0; top:0; bottom:0; width: 0; }
+    .mp-label  { font-size: .78rem; color: var(--text2); min-width: 35px; text-align: center; }
+
+    /* ── Order list (merge) ────────────────────────────────────────────── */
+    .order-list { list-style: none; margin: 1rem 0; }
+    .order-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      background: var(--bg3);
+      border-radius: 8px;
+      margin-bottom: 6px;
+      cursor: grab;
+      border: 1px solid transparent;
+      transition: all .2s;
+    }
+    .order-item:hover { border-color: var(--border); }
+    .order-item.dragging { opacity: .5; border: 1px dashed var(--accent); }
+    .drag-handle { color: var(--text2); cursor: grab; font-size: 1rem; }
+    .order-num {
+      width: 24px; height: 24px;
+      background: rgba(108,99,255,.2);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .78rem; font-weight: 700; color: var(--accent); flex-shrink: 0;
+    }
+
+    /* ── Page range input hint ─────────────────────────────────────────── */
+    .input-hint { font-size: .78rem; color: var(--text2); margin-top: 5px; }
+
+    /* ── Footer ────────────────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      color: var(--text2);
+      font-size: .83rem;
+    }
+
+    /* ── Responsive ────────────────────────────────────────────────────── */
+    @media (max-width: 700px) {
+      .form-row.cols-2,
+      .form-row.cols-3,
+      .form-row.cols-4 { grid-template-columns: 1fr 1fr; }
+      .tool-body { padding: 1.25rem; }
+      nav { display: none; }
+    }
+    @media (max-width: 480px) {
+      .form-row.cols-2,
+      .form-row.cols-3,
+      .form-row.cols-4 { grid-template-columns: 1fr; }
+    }
+
+    /* ── Scrollbar ─────────────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ──────────────────────────────────────────────────────────────── -->
+<header>
+  <div class="header-inner">
+    <a class="logo" href="#">
+      <div class="logo-icon">📄</div>
+      <span class="logo-text">PDF Tools<span class="logo-badge">PRO</span></span>
+    </a>
+    <nav>
+      <a href="#compress">Compressão</a>
+      <a href="#img2pdf">Img → PDF</a>
+      <a href="#crop">Recorte</a>
+      <a href="#merge">Juntar</a>
+      <a href="#extract">Extrair</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ── HERO ────────────────────────────────────────────────────────────────── -->
+<div class="hero">
+  <h1>Ferramenta Completa<br>de Processamento PDF</h1>
+  <p>Comprima, converta, recorte, junte e extraia páginas de PDFs.<br>
+     Suporte a arquivos de até <strong>500 MB</strong> e <strong>10.000 páginas</strong>.</p>
+  <div class="hero-badges">
+    <div class="badge green">✓ Até 500 MB</div>
+    <div class="badge blue">✓ Até 10.000 páginas</div>
+    <div class="badge purple">✓ Processamento local</div>
+    <div class="badge green">✓ Sem limite de uso</div>
+  </div>
+</div>
+
+<!-- ── TABS ─────────────────────────────────────────────────────────────────── -->
+<div class="tabs-wrapper">
+  <div class="tab-nav" role="tablist">
+    <button class="tab-btn active" data-tab="compress" role="tab">
+      <span class="tab-icon">⚡</span> Comprimir PDF
+    </button>
+    <button class="tab-btn" data-tab="img2pdf" role="tab">
+      <span class="tab-icon">🖼️</span> Imagem → PDF
+    </button>
+    <button class="tab-btn" data-tab="crop" role="tab">
+      <span class="tab-icon">✂️</span> Recortar Bordas
+    </button>
+    <button class="tab-btn" data-tab="merge" role="tab">
+      <span class="tab-icon">🔗</span> Juntar PDFs
+    </button>
+    <button class="tab-btn" data-tab="extract" role="tab">
+      <span class="tab-icon">📑</span> Extrair Páginas
+    </button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       TAB 1 — COMPRIMIR PDF
+  ════════════════════════════════════════════════════════════════════════ -->
+  <div id="tab-compress" class="tab-content active">
+    <div class="tool-card">
+      <div class="tool-header">
+        <div class="tool-icon" style="background: linear-gradient(135deg,#6c63ff,#8b7cf8)">⚡</div>
+        <div>
+          <div class="tool-title">Compressão de PDF</div>
+          <div class="tool-desc">Reduza o tamanho do PDF em até 80% com 3 níveis de compressão</div>
+        </div>
+      </div>
+      <div class="tool-body">
+        <!-- Drop zone -->
+        <div class="drop-zone" id="dz-compress"
+             ondragover="dzDragOver(event,'dz-compress')"
+             ondragleave="dzDragLeave(event,'dz-compress')"
+             ondrop="dzDrop(event,'dz-compress','fl-compress',false)">
+          <input type="file" id="fi-compress" accept=".pdf" onchange="filesSelected(this,'fl-compress',false)" />
+          <div class="drop-icon">☁️</div>
+          <div class="drop-title">Arraste o PDF aqui ou clique para selecionar</div>
+          <div class="drop-sub">Aceita PDFs de até 500 MB · Máx. 10.000 páginas</div>
+        </div>
+        <div id="fl-compress" class="file-list"></div>
+
+        <!-- PDF info -->
+        <div class="info-panel" id="info-compress"></div>
+
+        <!-- Nível -->
+        <label style="margin-top:1.5rem">Nível de Compressão</label>
+        <div class="level-select">
+          <button class="level-btn" data-lv="low" onclick="selectLevel(this,'sel-compress')">
+            <span class="lv-icon">🟢</span>
+            <span style="font-size:.95rem;font-weight:700">Leve</span>
+            <span class="lv-name">~20% redução</span>
+            <span class="lv-name" style="color:var(--text2)">Alta qualidade</span>
+          </button>
+          <button class="level-btn selected" data-lv="medium" onclick="selectLevel(this,'sel-compress')">
+            <span class="lv-icon">🟡</span>
+            <span style="font-size:.95rem;font-weight:700">Médio</span>
+            <span class="lv-name">~50% redução</span>
+            <span class="lv-name" style="color:var(--text2)">Equilibrado</span>
+          </button>
+          <button class="level-btn" data-lv="high" onclick="selectLevel(this,'sel-compress')">
+            <span class="lv-icon">🔴</span>
+            <span style="font-size:.95rem;font-weight:700">Máximo</span>
+            <span class="lv-name">~70% redução</span>
+            <span class="lv-name" style="color:var(--text2)">Menor qualidade</span>
+          </button>
+        </div>
+        <input type="hidden" id="sel-compress" value="medium" />
+
+        <button class="btn btn-primary btn-full" style="margin-top:1.5rem"
+                onclick="runCompress()">
+          ⚡ Comprimir PDF
+        </button>
+
+        <div class="progress-wrapper" id="prog-compress">
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill indeterminate" id="pbar-compress"></div>
+          </div>
+          <div class="progress-text" id="ptext-compress">Processando...</div>
+        </div>
+
+        <div class="result-box" id="res-compress">
+          <div class="result-stats" id="stats-compress"></div>
+          <a id="dl-compress" class="download-btn" download>
+            ⬇️ Baixar PDF Comprimido
+          </a>
+        </div>
+
+        <div class="alert hidden" id="alert-compress"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       TAB 2 — IMAGEM → PDF
+  ════════════════════════════════════════════════════════════════════════ -->
+  <div id="tab-img2pdf" class="tab-content">
+    <div class="tool-card">
+      <div class="tool-header">
+        <div class="tool-icon" style="background: linear-gradient(135deg,#4ecdc4,#44b09b)">🖼️</div>
+        <div>
+          <div class="tool-title">Converter Imagens em PDF</div>
+          <div class="tool-desc">JPG, PNG, BMP, GIF, TIFF, WEBP → PDF. Até 200 imagens por vez</div>
+        </div>
+      </div>
+      <div class="tool-body">
+        <div class="drop-zone" id="dz-img2pdf"
+             ondragover="dzDragOver(event,'dz-img2pdf')"
+             ondragleave="dzDragLeave(event,'dz-img2pdf')"
+             ondrop="dzDrop(event,'dz-img2pdf','fl-img2pdf',true)">
+          <input type="file" id="fi-img2pdf" accept="image/*" multiple
+                 onchange="filesSelected(this,'fl-img2pdf',true)" />
+          <div class="drop-icon">📸</div>
+          <div class="drop-title">Arraste as imagens aqui ou clique para selecionar</div>
+          <div class="drop-sub">JPG, PNG, BMP, GIF, TIFF, WEBP · Múltiplas imagens · Cada uma vira uma página</div>
+        </div>
+        <div id="fl-img2pdf" class="file-list"></div>
+
+        <div class="form-row cols-2" style="margin-top:1.25rem">
+          <div>
+            <label>Tamanho da Página</label>
+            <select id="pg-size">
+              <option value="A4" selected>A4 (210×297mm)</option>
+              <option value="A3">A3 (297×420mm)</option>
+              <option value="Letter">Letter (216×279mm)</option>
+              <option value="original">Tamanho original</option>
+            </select>
+          </div>
+          <div>
+            <label>Orientação</label>
+            <select id="pg-orient">
+              <option value="portrait" selected>Retrato</option>
+              <option value="landscape">Paisagem</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-full" style="margin-top:1.5rem"
+                onclick="runImg2Pdf()">
+          🖼️ Converter para PDF
+        </button>
+
+        <div class="progress-wrapper" id="prog-img2pdf">
+          <div class="progress-bar-track"><div class="progress-bar-fill indeterminate"></div></div>
+          <div class="progress-text">Convertendo imagens...</div>
+        </div>
+
+        <div class="result-box" id="res-img2pdf">
+          <div class="result-stats" id="stats-img2pdf"></div>
+          <a id="dl-img2pdf" class="download-btn" download>
+            ⬇️ Baixar PDF Gerado
+          </a>
+        </div>
+        <div class="alert hidden" id="alert-img2pdf"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       TAB 3 — RECORTAR BORDAS
+  ════════════════════════════════════════════════════════════════════════ -->
+  <div id="tab-crop" class="tab-content">
+    <div class="tool-card">
+      <div class="tool-header">
+        <div class="tool-icon" style="background: linear-gradient(135deg,#f7971e,#ffd200)">✂️</div>
+        <div>
+          <div class="tool-title">Recortar Bordas do PDF</div>
+          <div class="tool-desc">Remova margens indesejadas de todas as páginas. Suporte a mm, cm, pt, polegadas</div>
+        </div>
+      </div>
+      <div class="tool-body">
+        <div class="drop-zone" id="dz-crop"
+             ondragover="dzDragOver(event,'dz-crop')"
+             ondragleave="dzDragLeave(event,'dz-crop')"
+             ondrop="dzDrop(event,'dz-crop','fl-crop',false)">
+          <input type="file" id="fi-crop" accept=".pdf"
+                 onchange="filesSelected(this,'fl-crop',false)" />
+          <div class="drop-icon">📐</div>
+          <div class="drop-title">Arraste o PDF aqui</div>
+          <div class="drop-sub">Até 500 MB · Os recortes serão aplicados em TODAS as páginas</div>
+        </div>
+        <div id="fl-crop" class="file-list"></div>
+        <div class="info-panel" id="info-crop"></div>
+
+        <div style="display:flex;align-items:center;gap:1rem;margin-top:1.5rem">
+          <label style="margin:0">Unidade:</label>
+          <select id="crop-unit" style="width:120px" onchange="updateMarginPreview()">
+            <option value="mm" selected>mm</option>
+            <option value="cm">cm</option>
+            <option value="pt">pt</option>
+            <option value="inch">polegada</option>
+          </select>
+          <span class="input-hint">Valores positivos = recortar borda</span>
+        </div>
+
+        <!-- Visual preview -->
+        <div class="margin-preview" style="margin-top:1.5rem">
+          <span class="mp-label" id="lbl-top">Top 0</span>
+          <div class="mp-row">
+            <span class="mp-label" id="lbl-left">L 0</span>
+            <div class="mp-page" id="mp-page">
+              <div class="mp-crop-overlay mp-top"    id="ov-top"></div>
+              <div class="mp-crop-overlay mp-bottom" id="ov-bottom"></div>
+              <div class="mp-crop-overlay mp-left"   id="ov-left"></div>
+              <div class="mp-crop-overlay mp-right"  id="ov-right"></div>
+            </div>
+            <span class="mp-label" id="lbl-right">R 0</span>
+          </div>
+          <span class="mp-label" id="lbl-bottom">Bot 0</span>
+        </div>
+
+        <div class="form-row cols-4">
+          <div>
+            <label>Superior</label>
+            <input type="number" id="crop-top" value="0" step="0.5" min="0"
+                   oninput="updateMarginPreview()" />
+          </div>
+          <div>
+            <label>Inferior</label>
+            <input type="number" id="crop-bottom" value="0" step="0.5" min="0"
+                   oninput="updateMarginPreview()" />
+          </div>
+          <div>
+            <label>Esquerda</label>
+            <input type="number" id="crop-left" value="0" step="0.5" min="0"
+                   oninput="updateMarginPreview()" />
+          </div>
+          <div>
+            <label>Direita</label>
+            <input type="number" id="crop-right" value="0" step="0.5" min="0"
+                   oninput="updateMarginPreview()" />
+          </div>
+        </div>
+
+        <div style="display:flex;gap:.75rem;margin-top:.5rem;flex-wrap:wrap">
+          <button class="btn" style="background:var(--bg3);color:var(--text2);border:1px solid var(--border)"
+                  onclick="setCropPreset(10,10,10,10)">
+            📐 Remover 10mm
+          </button>
+          <button class="btn" style="background:var(--bg3);color:var(--text2);border:1px solid var(--border)"
+                  onclick="setCropPreset(20,20,20,20)">
+            📐 Remover 20mm
+          </button>
+          <button class="btn" style="background:var(--bg3);color:var(--text2);border:1px solid var(--border)"
+                  onclick="setCropPreset(0,0,0,0)">
+            ↩ Resetar
+          </button>
+        </div>
+
+        <button class="btn btn-primary btn-full" style="margin-top:1.5rem"
+                onclick="runCrop()">
+          ✂️ Recortar PDF
+        </button>
+
+        <div class="progress-wrapper" id="prog-crop">
+          <div class="progress-bar-track"><div class="progress-bar-fill indeterminate"></div></div>
+          <div class="progress-text">Recortando páginas...</div>
+        </div>
+
+        <div class="result-box" id="res-crop">
+          <div class="result-stats" id="stats-crop"></div>
+          <a id="dl-crop" class="download-btn" download>⬇️ Baixar PDF Recortado</a>
+        </div>
+        <div class="alert hidden" id="alert-crop"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       TAB 4 — JUNTAR PDFs
+  ════════════════════════════════════════════════════════════════════════ -->
+  <div id="tab-merge" class="tab-content">
+    <div class="tool-card">
+      <div class="tool-header">
+        <div class="tool-icon" style="background: linear-gradient(135deg,#ff6584,#e55151)">🔗</div>
+        <div>
+          <div class="tool-title">Juntar Múltiplos PDFs</div>
+          <div class="tool-desc">Una até 50 PDFs em um único documento. Arraste para reordenar</div>
+        </div>
+      </div>
+      <div class="tool-body">
+        <div class="drop-zone" id="dz-merge"
+             ondragover="dzDragOver(event,'dz-merge')"
+             ondragleave="dzDragLeave(event,'dz-merge')"
+             ondrop="dzDrop(event,'dz-merge','fl-merge',true)">
+          <input type="file" id="fi-merge" accept=".pdf" multiple
+                 onchange="filesSelected(this,'fl-merge',true)" />
+          <div class="drop-icon">📚</div>
+          <div class="drop-title">Arraste os PDFs aqui ou clique para selecionar</div>
+          <div class="drop-sub">Mínimo 2 · Máximo 50 PDFs · Cada um até 500 MB</div>
+        </div>
+
+        <div style="margin-top:1rem;font-size:.85rem;color:var(--text2)">
+          📋 Ordem dos documentos no PDF final (arraste para reordenar):
+        </div>
+        <ul id="fl-merge" class="order-list"></ul>
+
+        <button class="btn btn-primary btn-full" style="margin-top:.5rem"
+                onclick="runMerge()">
+          🔗 Juntar PDFs
+        </button>
+
+        <div class="progress-wrapper" id="prog-merge">
+          <div class="progress-bar-track"><div class="progress-bar-fill indeterminate"></div></div>
+          <div class="progress-text">Unindo documentos...</div>
+        </div>
+
+        <div class="result-box" id="res-merge">
+          <div class="result-stats" id="stats-merge"></div>
+          <a id="dl-merge" class="download-btn" download>⬇️ Baixar PDF Unido</a>
+        </div>
+        <div class="alert hidden" id="alert-merge"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       TAB 5 — EXTRAIR PÁGINAS
+  ════════════════════════════════════════════════════════════════════════ -->
+  <div id="tab-extract" class="tab-content">
+    <div class="tool-card">
+      <div class="tool-header">
+        <div class="tool-icon" style="background: linear-gradient(135deg,#43e97b,#38b89a)">📑</div>
+        <div>
+          <div class="tool-title">Extrair Páginas Específicas</div>
+          <div class="tool-desc">Selecione páginas individuais ou faixas. Ex: 1,10,20-30,50</div>
+        </div>
+      </div>
+      <div class="tool-body">
+        <div class="drop-zone" id="dz-extract"
+             ondragover="dzDragOver(event,'dz-extract')"
+             ondragleave="dzDragLeave(event,'dz-extract')"
+             ondrop="dzDrop(event,'dz-extract','fl-extract',false)">
+          <input type="file" id="fi-extract" accept=".pdf"
+                 onchange="filesSelected(this,'fl-extract',false);loadPdfInfo(this,'info-extract')" />
+          <div class="drop-icon">📑</div>
+          <div class="drop-title">Arraste o PDF aqui</div>
+          <div class="drop-sub">Até 500 MB · 10.000 páginas</div>
+        </div>
+        <div id="fl-extract" class="file-list"></div>
+        <div class="info-panel" id="info-extract"></div>
+
+        <div style="margin-top:1.25rem">
+          <label>Páginas a Extrair</label>
+          <input type="text" id="extract-pages" placeholder="Ex: 1, 10, 20, 30   ou   1-5, 10, 15-20, 50" />
+          <div class="input-hint">
+            💡 Use vírgulas para separar páginas e hífen para faixas:<br>
+            &nbsp;&nbsp;&nbsp;• <strong>1,10,20,30</strong> → extrai as páginas 1, 10, 20 e 30<br>
+            &nbsp;&nbsp;&nbsp;• <strong>1-5,10,20-25</strong> → extrai da 1 à 5, a 10, e da 20 à 25<br>
+            &nbsp;&nbsp;&nbsp;• <strong>1,3,5-10,50</strong> → combinação livre
+          </div>
+        </div>
+
+        <!-- Atalhos rápidos -->
+        <div style="margin-top:1rem">
+          <div style="font-size:.8rem;color:var(--text2);margin-bottom:6px">ATALHOS RÁPIDOS:</div>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+            <button class="btn" style="background:var(--bg3);color:var(--text2);border:1px solid var(--border);padding:6px 12px;font-size:.8rem"
+                    onclick="setExtractPages('1')">Pág. 1</button>
+            <button class="btn" style="background:var(--bg3);color:var(--text2);border:1px solid var(--border);padding:6px 12px;font-size:.8rem"
+                    onclick="setExtractPages('1-10')">Págs. 1-10</button>
+            <button class="btn" style="background:var(--bg3);color:var(--text2);border:1px solid var(--border);padding:6px 12px;font-size:.8rem"
+                    onclick="setExtractPages('1,5,10,15,20')">1,5,10,15,20</button>
+            <button class="btn" style="background:var(--bg3);color:var(--text2);border:1px solid var(--border);padding:6px 12px;font-size:.8rem"
+                    id="btn-first-last">1ª e Última</button>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-full" style="margin-top:1.5rem"
+                onclick="runExtract()">
+          📑 Extrair Páginas
+        </button>
+
+        <div class="progress-wrapper" id="prog-extract">
+          <div class="progress-bar-track"><div class="progress-bar-fill indeterminate"></div></div>
+          <div class="progress-text">Extraindo páginas...</div>
+        </div>
+
+        <div class="result-box" id="res-extract">
+          <div class="result-stats" id="stats-extract"></div>
+          <a id="dl-extract" class="download-btn" download>⬇️ Baixar PDF com Páginas Extraídas</a>
+        </div>
+        <div class="alert hidden" id="alert-extract"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>PDF Tools Pro &mdash; Processamento local seguro. Arquivos removidos automaticamente após 1 hora.</p>
+  <p style="margin-top:.5rem;opacity:.6">Suporta PDFs de até 500 MB e 10.000 páginas.</p>
+</footer>
+
+<!-- ── JAVASCRIPT ─────────────────────────────────────────────────────────── -->
+<script>
+'use strict';
+
+/* ─── Estado global ─────────────────────────────────────────────────────── */
+const state = {
+  compress: { files: [] },
+  img2pdf:  { files: [] },
+  crop:     { files: [] },
+  merge:    { files: [] },
+  extract:  { files: [], totalPages: 0 },
+};
+
+const API = '';  // mesmo host
+
+/* ─── Tabs ──────────────────────────────────────────────────────────────── */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const t = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + t).classList.add('active');
+    history.replaceState(null,'','#'+t);
+  });
+});
+
+// Abrir tab pela URL hash
+const hash = location.hash.replace('#','');
+if (['compress','img2pdf','crop','merge','extract'].includes(hash)) {
+  document.querySelector(`[data-tab="${hash}"]`)?.click();
+}
+
+/* ─── Drop zone helpers ─────────────────────────────────────────────────── */
+function dzDragOver(e, id) {
+  e.preventDefault();
+  document.getElementById(id).classList.add('dragover');
+}
+function dzDragLeave(e, id) {
+  document.getElementById(id).classList.remove('dragover');
+}
+function dzDrop(e, dzId, flId, multiple) {
+  e.preventDefault();
+  document.getElementById(dzId).classList.remove('dragover');
+  const files = Array.from(e.dataTransfer.files);
+  addFilesToList(files, flId, multiple);
+}
+function filesSelected(input, flId, multiple) {
+  const files = Array.from(input.files);
+  addFilesToList(files, flId, multiple);
+}
+
+function addFilesToList(newFiles, flId, multiple) {
+  const tool = flIdToTool(flId);
+  if (!multiple) {
+    state[tool].files = newFiles.slice(0,1);
+  } else {
+    state[tool].files.push(...newFiles);
+    // Dedup por nome
+    const seen = new Set();
+    state[tool].files = state[tool].files.filter(f => {
+      const ok = !seen.has(f.name); seen.add(f.name); return ok;
+    });
+  }
+  renderFileList(flId, tool, multiple);
+
+  // Info automática para compress e crop
+  if (tool === 'compress' || tool === 'crop') {
+    loadPdfInfoFromFile(state[tool].files[0], 'info-' + tool);
+  }
+}
+
+function flIdToTool(flId) {
+  return flId.replace('fl-','');
+}
+
+function fmtSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+  return (bytes/1024/1024).toFixed(2) + ' MB';
+}
+
+function renderFileList(flId, tool, multiple) {
+  const el = document.getElementById(flId);
+  if (!el) return;
+  const files = state[tool].files;
+
+  if (tool === 'merge') {
+    // Drag-to-reorder list
+    el.innerHTML = files.map((f, i) => `
+      <li class="order-item" data-idx="${i}" draggable="true"
+          ondragstart="mergeDragStart(event,${i})"
+          ondragover="mergeDragOver(event)"
+          ondrop="mergeDrop(event,${i})">
+        <span class="drag-handle">⠿</span>
+        <span class="order-num">${i+1}</span>
+        <span class="fi-icon">📄</span>
+        <span class="fi-name">${escHtml(f.name)}</span>
+        <span class="fi-size">${fmtSize(f.size)}</span>
+        <button class="fi-del" onclick="removeFile('${tool}',${i})">✕</button>
+      </li>`).join('');
+  } else {
+    el.innerHTML = files.map((f, i) => `
+      <div class="file-item">
+        <span class="fi-icon">${f.type.startsWith('image') ? '🖼️' : '📄'}</span>
+        <span class="fi-name">${escHtml(f.name)}</span>
+        <span class="fi-size">${fmtSize(f.size)}</span>
+        <button class="fi-del" onclick="removeFile('${tool}',${i})">✕</button>
+      </div>`).join('');
+  }
+}
+
+function removeFile(tool, idx) {
+  state[tool].files.splice(idx, 1);
+  const flId = 'fl-' + tool;
+  renderFileList(flId, tool, tool === 'merge' || tool === 'img2pdf');
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ─── Drag-to-reorder (merge) ───────────────────────────────────────────── */
+let mergeDragIdx = null;
+function mergeDragStart(e, i) {
+  mergeDragIdx = i;
+  setTimeout(() => e.target.classList.add('dragging'), 0);
+}
+function mergeDragOver(e) { e.preventDefault(); }
+function mergeDrop(e, toIdx) {
+  e.preventDefault();
+  if (mergeDragIdx === null || mergeDragIdx === toIdx) return;
+  const arr = state.merge.files;
+  const item = arr.splice(mergeDragIdx, 1)[0];
+  arr.splice(toIdx, 0, item);
+  mergeDragIdx = null;
+  renderFileList('fl-merge', 'merge', true);
+}
+
+/* ─── Level select ──────────────────────────────────────────────────────── */
+function selectLevel(btn, hiddenId) {
+  btn.closest('.level-select').querySelectorAll('.level-btn')
+     .forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById(hiddenId).value = btn.dataset.lv;
+}
+
+/* ─── PDF Info ──────────────────────────────────────────────────────────── */
+async function loadPdfInfoFromFile(file, panelId) {
+  if (!file) return;
+  const panel = document.getElementById(panelId);
+  if (!panel) return;
+  panel.innerHTML = '<span style="color:var(--text2);font-size:.85rem">🔍 Lendo informações do PDF...</span>';
+  panel.classList.add('visible');
+  try {
+    const fd = new FormData();
+    fd.append('file', file);
+    const r = await fetch(API + '/api/info', {method:'POST',body:fd});
+    if (!r.ok) { panel.classList.remove('visible'); return; }
+    const info = await r.json();
+    panel.innerHTML = `
+      <div class="info-grid">
+        <div class="info-item"><div class="info-key">Arquivo</div><div class="info-val">${escHtml(info.filename)}</div></div>
+        <div class="info-item"><div class="info-key">Tamanho</div><div class="info-val">${info.size_mb} MB</div></div>
+        <div class="info-item"><div class="info-key">Páginas</div><div class="info-val">${info.total_pages.toLocaleString('pt-BR')}</div></div>
+        <div class="info-item"><div class="info-key">Dimensão</div><div class="info-val">${info.page_width_mm}×${info.page_height_mm}mm</div></div>
+        ${info.metadata?.title ? `<div class="info-item"><div class="info-key">Título</div><div class="info-val">${escHtml(info.metadata.title)}</div></div>` : ''}
+      </div>`;
+    if (panelId === 'info-extract') {
+      state.extract.totalPages = info.total_pages;
+      document.getElementById('btn-first-last').onclick =
+        () => setExtractPages(`1,${info.total_pages}`);
+    }
+  } catch {
+    panel.classList.remove('visible');
+  }
+}
+
+function loadPdfInfo(input, panelId) {
+  const file = input.files[0];
+  if (file) loadPdfInfoFromFile(file, panelId);
+}
+
+/* ─── Progress helpers ──────────────────────────────────────────────────── */
+function showProgress(tool, text) {
+  const w = document.getElementById('prog-' + tool);
+  if (!w) return;
+  w.classList.add('visible');
+  const t = w.querySelector('.progress-text');
+  if (t) t.textContent = text || 'Processando...';
+}
+function hideProgress(tool) {
+  const w = document.getElementById('prog-' + tool);
+  if (w) w.classList.remove('visible');
+}
+
+/* ─── Alert helpers ─────────────────────────────────────────────────────── */
+function showAlert(tool, msg, type='error') {
+  const el = document.getElementById('alert-' + tool);
+  if (!el) return;
+  const icon = type === 'success' ? '✅' : type === 'info' ? 'ℹ️' : '❌';
+  el.className = `alert ${type}`;
+  el.innerHTML = `<span class="alert-icon">${icon}</span><span>${escHtml(msg)}</span>`;
+}
+function clearAlert(tool) {
+  const el = document.getElementById('alert-' + tool);
+  if (el) el.className = 'alert hidden';
+}
+
+/* ─── Margin preview ────────────────────────────────────────────────────── */
+function updateMarginPreview() {
+  const t = +document.getElementById('crop-top').value    || 0;
+  const b = +document.getElementById('crop-bottom').value || 0;
+  const l = +document.getElementById('crop-left').value   || 0;
+  const r = +document.getElementById('crop-right').value  || 0;
+  const u = document.getElementById('crop-unit').value;
+
+  // Converter para % do preview (page = 100x130 visual)
+  // Escala visual máxima = 40% por lado
+  const maxVal = { mm:60, cm:6, pt:170, inch:2.4 };
+  const scale = 40 / (maxVal[u] || 60);
+
+  document.getElementById('ov-top').style.height    = Math.min(t*scale, 50) + 'px';
+  document.getElementById('ov-bottom').style.height = Math.min(b*scale, 50) + 'px';
+  document.getElementById('ov-left').style.width    = Math.min(l*scale, 50) + 'px';
+  document.getElementById('ov-right').style.width   = Math.min(r*scale, 50) + 'px';
+
+  document.getElementById('lbl-top').textContent    = `Top ${t}${u}`;
+  document.getElementById('lbl-bottom').textContent = `Bot ${b}${u}`;
+  document.getElementById('lbl-left').textContent   = `L ${l}${u}`;
+  document.getElementById('lbl-right').textContent  = `R ${r}${u}`;
+}
+
+function setCropPreset(t, b, l, r) {
+  document.getElementById('crop-top').value    = t;
+  document.getElementById('crop-bottom').value = b;
+  document.getElementById('crop-left').value   = l;
+  document.getElementById('crop-right').value  = r;
+  // Mudar para mm automaticamente
+  document.getElementById('crop-unit').value = 'mm';
+  updateMarginPreview();
+}
+
+/* ─── Extrair: atalhos ──────────────────────────────────────────────────── */
+function setExtractPages(val) {
+  document.getElementById('extract-pages').value = val;
+}
+
+/* ─── Download de blob ──────────────────────────────────────────────────── */
+async function doFetch(tool, url, formData, onSuccess) {
+  clearAlert(tool);
+  showProgress(tool, 'Enviando arquivo...');
+  const res0 = document.getElementById('res-' + tool);
+  if (res0) res0.classList.remove('visible');
+
+  try {
+    showProgress(tool, 'Processando no servidor...');
+    const resp = await fetch(url, { method: 'POST', body: formData });
+
+    if (!resp.ok) {
+      let msg = `Erro ${resp.status}`;
+      try { const j = await resp.json(); msg = j.detail || msg; } catch {}
+      throw new Error(msg);
+    }
+
+    showProgress(tool, 'Preparando download...');
+    const blob = await resp.blob();
+    const blobUrl = URL.createObjectURL(blob);
+
+    const headers = {};
+    resp.headers.forEach((v,k) => headers[k] = v);
+
+    hideProgress(tool);
+    onSuccess(blobUrl, headers);
+
+  } catch (err) {
+    hideProgress(tool);
+    showAlert(tool, err.message, 'error');
+  }
+}
+
+function setupDownload(dlId, blobUrl, filename) {
+  const a = document.getElementById(dlId);
+  a.href = blobUrl;
+  a.download = filename;
+}
+
+function showResult(tool, stats, blobUrl, filename, dlId) {
+  const box   = document.getElementById('res-' + tool);
+  const sBox  = document.getElementById('stats-' + tool);
+  if (!box || !sBox) return;
+
+  sBox.innerHTML = stats.map(s => `
+    <div class="stat-item">
+      <div class="stat-value">${s.value}</div>
+      <div class="stat-label">${s.label}</div>
+    </div>`).join('');
+
+  setupDownload(dlId, blobUrl, filename);
+  box.classList.add('visible');
+}
+
+/* ═════════════════════════════════════════════════════════════════════════
+   AÇÃO 1 — COMPRESSÃO
+═══════════════════════════════════════════════════════════════════════ */
+async function runCompress() {
+  if (!state.compress.files.length) {
+    showAlert('compress', 'Selecione um arquivo PDF primeiro.'); return;
+  }
+  const file = state.compress.files[0];
+  const level = document.getElementById('sel-compress').value;
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('level', level);
+
+  await doFetch('compress', API + '/api/compress', fd, (blobUrl, hdrs) => {
+    const orig = +hdrs['x-original-size']   || file.size;
+    const comp = +hdrs['x-compressed-size'] || 0;
+    const pct  = +hdrs['x-reduction-percent'] || 0;
+    const pages = hdrs['x-total-pages'] || '?';
+
+    showResult('compress', [
+      { value: fmtSize(orig),        label: 'Original' },
+      { value: fmtSize(comp),        label: 'Comprimido' },
+      { value: pct + '%',            label: 'Redução' },
+      { value: Number(pages).toLocaleString('pt-BR'), label: 'Páginas' },
+    ], blobUrl, `comprimido_${level}_${file.name}`, 'dl-compress');
+
+    if (pct >= 0) showAlert('compress', `Compressão concluída! Arquivo reduzido em ${pct}%. Clique em baixar.`, 'success');
+  });
+}
+
+/* ═════════════════════════════════════════════════════════════════════════
+   AÇÃO 2 — IMAGEM → PDF
+══��════════════════════════════════════════════════════════════════════ */
+async function runImg2Pdf() {
+  if (!state.img2pdf.files.length) {
+    showAlert('img2pdf', 'Selecione pelo menos uma imagem.'); return;
+  }
+  const fd = new FormData();
+  state.img2pdf.files.forEach(f => fd.append('files', f));
+  fd.append('page_size',   document.getElementById('pg-size').value);
+  fd.append('orientation', document.getElementById('pg-orient').value);
+
+  await doFetch('img2pdf', API + '/api/image-to-pdf', fd, (blobUrl, hdrs) => {
+    const pages = hdrs['x-total-pages'] || state.img2pdf.files.length;
+    showResult('img2pdf', [
+      { value: state.img2pdf.files.length, label: 'Imagens' },
+      { value: Number(pages).toLocaleString('pt-BR'), label: 'Páginas PDF' },
+    ], blobUrl, 'imagens_convertidas.pdf', 'dl-img2pdf');
+    showAlert('img2pdf', `${state.img2pdf.files.length} imagem(ns) convertida(s) com sucesso!`, 'success');
+  });
+}
+
+/* ═════════════════════════════════════════════════════════════════════════
+   AÇÃO 3 — RECORTAR BORDAS
+═══════════════════════════════════════════════════════════════════════ */
+async function runCrop() {
+  if (!state.crop.files.length) {
+    showAlert('crop', 'Selecione um arquivo PDF primeiro.'); return;
+  }
+  const t = +document.getElementById('crop-top').value    || 0;
+  const b = +document.getElementById('crop-bottom').value || 0;
+  const l = +document.getElementById('crop-left').value   || 0;
+  const r = +document.getElementById('crop-right').value  || 0;
+
+  if (t === 0 && b === 0 && l === 0 && r === 0) {
+    showAlert('crop', 'Defina pelo menos um valor de recorte maior que 0.'); return;
+  }
+
+  const file = state.crop.files[0];
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('top',    t);
+  fd.append('bottom', b);
+  fd.append('left',   l);
+  fd.append('right',  r);
+  fd.append('unit',   document.getElementById('crop-unit').value);
+
+  await doFetch('crop', API + '/api/crop-margins', fd, (blobUrl, hdrs) => {
+    const pages = hdrs['x-total-pages'] || '?';
+    showResult('crop', [
+      { value: Number(pages).toLocaleString('pt-BR'), label: 'Páginas' },
+      { value: t + '/' + b, label: 'Topo/Base' },
+      { value: l + '/' + r, label: 'Esq/Dir' },
+    ], blobUrl, `recortado_${file.name}`, 'dl-crop');
+    showAlert('crop', 'Bordas recortadas com sucesso!', 'success');
+  });
+}
+
+/* ═════════════════════════════════════════════════════════════════════════
+   AÇÃO 4 — JUNTAR PDFs
+═══════════════════════════════════════════════════════════════════════ */
+async function runMerge() {
+  if (state.merge.files.length < 2) {
+    showAlert('merge', 'Selecione pelo menos 2 PDFs para juntar.'); return;
+  }
+  const fd = new FormData();
+  state.merge.files.forEach(f => fd.append('files', f));
+
+  await doFetch('merge', API + '/api/merge', fd, (blobUrl, hdrs) => {
+    const pages = hdrs['x-total-pages']  || '?';
+    const merged = hdrs['x-files-merged'] || state.merge.files.length;
+    showResult('merge', [
+      { value: Number(merged).toLocaleString('pt-BR'), label: 'Arquivos' },
+      { value: Number(pages).toLocaleString('pt-BR'),  label: 'Total Páginas' },
+    ], blobUrl, 'documentos_unidos.pdf', 'dl-merge');
+    showAlert('merge', `${merged} PDFs unidos com sucesso! Total: ${pages} páginas.`, 'success');
+  });
+}
+
+/* ═════════════════════════════════════════════════════════════════════════
+   AÇÃO 5 — EXTRAIR PÁGINAS
+═══════════════════════════════════════════════════════════════════════ */
+async function runExtract() {
+  if (!state.extract.files.length) {
+    showAlert('extract', 'Selecione um arquivo PDF primeiro.'); return;
+  }
+  const pages = document.getElementById('extract-pages').value.trim();
+  if (!pages) {
+    showAlert('extract', 'Informe as páginas que deseja extrair.'); return;
+  }
+
+  const file = state.extract.files[0];
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('pages', pages);
+
+  await doFetch('extract', API + '/api/extract-pages', fd, (blobUrl, hdrs) => {
+    const ext  = hdrs['x-pages-extracted']       || '?';
+    const orig = hdrs['x-total-original-pages']  || '?';
+    const list = hdrs['x-extracted-list']         || pages;
+
+    showResult('extract', [
+      { value: Number(orig).toLocaleString('pt-BR'), label: 'Total Original' },
+      { value: Number(ext).toLocaleString('pt-BR'),  label: 'Extraídas' },
+    ], blobUrl, `paginas_${pages.replace(/[,\s]+/g,'_')}_${file.name}`, 'dl-extract');
+    showAlert('extract', `${ext} página(s) extraída(s) com sucesso! (${list.length > 60 ? list.slice(0,60)+'…' : list})`, 'success');
+  });
+}
+
+// ── Override para extract: também carrega info
+document.getElementById('fi-extract').addEventListener('change', function() {
+  if (this.files[0]) {
+    state.extract.files = [this.files[0]];
+    renderFileList('fl-extract', 'extract', false);
+    loadPdfInfoFromFile(this.files[0], 'info-extract');
+  }
+});
+
+// Inicializar preview de margem
+updateMarginPreview();
+</script>
+</body>
+</html>
