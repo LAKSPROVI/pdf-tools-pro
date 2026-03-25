@@ -3,20 +3,21 @@
 # pikepdf exige libqpdf, então precisamos de algumas libs nativas.
 FROM python:3.12-slim AS base
 
-# Dependências nativas necessárias pelo pikepdf (libqpdf) e Pillow (libjpeg, zlib, etc.)
+# Dependências nativas necessárias pelo pikepdf (libqpdf) e Pillow
+# Nomes de pacotes compatíveis com Debian Bookworm (base do python:3.12-slim) — AMD64 e ARM64
 RUN apt-get update && apt-get install -y --no-install-recommends \
         libqpdf-dev \
-        libqpdf29 \
-        libjpeg62-turbo \
         zlib1g \
+        libjpeg-dev \
         libfreetype6 \
         liblcms2-2 \
         libopenjp2-7 \
-        libtiff6 \
-        libwebp7 \
-        libffi8 \
+        libtiff-dev \
+        libwebp-dev \
+        libffi-dev \
         gcc \
         g++ \
+        curl \
     && rm -rf /var/lib/apt/lists/*
 
 # ─── Stage 2: Instalar dependências Python ───────────────────────────────────
