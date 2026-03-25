@@ -442,10 +442,10 @@ async def crop_margins(
                     raise HTTPException(400, f"Recorte muito agressivo na página {i+1}: dimensão resultante menor que 10pt")
 
                 new_mb = pikepdf.Array([
-                    pikepdf.Decimal(str(round(new_x0, 4))),
-                    pikepdf.Decimal(str(round(new_y0, 4))),
-                    pikepdf.Decimal(str(round(new_x1, 4))),
-                    pikepdf.Decimal(str(round(new_y1, 4)))
+                    Decimal(str(round(new_x0, 4))),
+                    Decimal(str(round(new_y0, 4))),
+                    Decimal(str(round(new_x1, 4))),
+                    Decimal(str(round(new_y1, 4)))
                 ])
                 page.MediaBox = new_mb
                 # Sincronizar CropBox com MediaBox
