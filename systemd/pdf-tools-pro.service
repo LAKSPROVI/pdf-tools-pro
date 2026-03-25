@@ -1,0 +1,53 @@
+# =============================================================================
+# systemd/pdf-tools-pro.service
+# Serviço systemd para garantir que o Docker Compose inicia com o sistema
+# =============================================================================
+# Instalação:
+#   sudo cp systemd/pdf-tools-pro.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable pdf-tools-pro
+#   sudo systemctl start pdf-tools-pro
+#
+# Comandos:
+#   sudo systemctl status  pdf-tools-pro
+#   sudo systemctl restart pdf-tools-pro
+#   sudo journalctl -u pdf-tools-pro -f
+# =============================================================================
+
+[Unit]
+Description=PDF Tools Pro — FastAPI + Docker Compose
+Documentation=https://github.com/SEU_USUARIO/pdf-tools-pro
+After=docker.service network-online.target
+Requires=docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/opt/pdf-tools-pro
+
+# Iniciar
+ExecStart=/usr/bin/docker compose -f /opt/pdf-tools-pro/docker-compose.prod.yml up -d --remove-orphans
+
+# Parar
+ExecStop=/usr/bin/docker compose -f /opt/pdf-tools-pro/docker-compose.prod.yml down
+
+# Recarregar (restart suave)
+ExecReload=/usr/bin/docker compose -f /opt/pdf-tools-pro/docker-compose.prod.yml restart
+
+# Reiniciar automaticamente em caso de falha
+Restart=on-failure
+RestartSec=10s
+
+# Timeout para inicialização (build da imagem pode demorar)
+TimeoutStartSec=120
+TimeoutStopSec=30
+
+# Usuário — deve ter acesso ao socket Docker
+User=root
+
+# Variáveis de ambiente
+EnvironmentFile=-/opt/pdf-tools-pro/.env.production
+
+[Install]
+WantedBy=multi-user.target

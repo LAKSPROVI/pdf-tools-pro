@@ -1,0 +1,46 @@
+# fly.toml — Deploy no Fly.io
+# Documentação: https://fly.io/docs/reference/configuration/
+# Para criar o app: fly launch --no-deploy  (e depois edite este arquivo)
+
+app = "pdf-tools-pro"          # Troque pelo nome do seu app no Fly.io
+primary_region = "gru"        # São Paulo — data center mais próximo do Brasil
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PDF_TOOLS_DATA_DIR = "/tmp/pdf_tools"
+  PYTHONUNBUFFERED   = "1"
+
+[http_service]
+  internal_port       = 8000
+  force_https         = true
+  auto_stop_machines  = true    # Economiza créditos parando quando inativo
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [http_service.concurrency]
+    type       = "connections"
+    hard_limit = 25
+    soft_limit = 20
+
+# Checks de saúde
+[[http_service.checks]]
+  grace_period  = "10s"
+  interval      = "30s"
+  method        = "GET"
+  path          = "/health"
+  protocol      = "http"
+  timeout       = "10s"
+
+# Recursos da máquina virtual
+[[vm]]
+  size   = "shared-cpu-1x"   # 256 MB RAM (plano gratuito)
+  # Para arquivos grandes, use:
+  # size = "shared-cpu-2x"   # 512 MB
+  # size = "performance-1x"  # 2 GB
+
+# Volume persistente opcional (necessário apenas se quiser logs persistentes)
+# [mounts]
+#   source      = "pdf_data"
+#   destination = "/data"

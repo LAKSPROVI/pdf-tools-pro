@@ -1,0 +1,32 @@
+# render.yaml — Deploy automático no Render.com
+# Documentação: https://render.com/docs/yaml-spec
+
+services:
+  - type: web
+    name: pdf-tools-pro
+    runtime: docker            # Usar Dockerfile (mais confiável para pikepdf/libqpdf)
+    dockerfilePath: ./Dockerfile
+    plan: starter              # plano gratuito disponível (512 MB RAM)
+    # Para produção com arquivos grandes, use "standard" (2 GB RAM) ou maior
+    region: ohio               # us-east-1 (mais próximo do BR dentre as opções)
+    branch: main
+
+    # Variáveis de ambiente
+    envVars:
+      - key: PORT
+        value: 10000           # Render injeta automaticamente, mas declaramos por clareza
+      - key: PDF_TOOLS_DATA_DIR
+        value: /tmp/pdf_tools
+      - key: PYTHONUNBUFFERED
+        value: "1"
+
+    # Health check
+    healthCheckPath: /health
+
+    # Disk efêmero — Render free tier não tem disco persistente.
+    # Arquivos temporários ficam em /tmp (limpados a cada restart).
+    # Se precisar persistência, adicione um "disk" aqui (planos pagos):
+    # disk:
+    #   name: pdf-data
+    #   mountPath: /data
+    #   sizeGB: 5

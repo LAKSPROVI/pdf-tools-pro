@@ -1,0 +1,50 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyc
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ── Ambientes virtuais ────────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+
+# ── Arquivos temporários gerados em runtime ────────────────────────────────────
+uploads/
+outputs/
+pdf_tools/
+*.log
+
+# ── Documentação e scripts Windows ────────────────────────────────────────────
+iniciar.bat
+RELATORIO.html
+static/RELATORIO.html
+README.md
+
+# ── IDE e OS ──────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Git ───────────────────────────────────────────────────────────────────────
+.git/
+.gitignore
+
+# ── Variáveis de ambiente (nunca dentro da imagem!) ───────────────────────────
+.env
+.env.local
+.env.*

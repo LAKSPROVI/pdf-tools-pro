@@ -1,7 +1,7 @@
 """
 PDF Tools Backend - API FastAPI Robusta
 Suporta PDFs de até 10.000 páginas e 500MB
-Equipe de engenharia sênior - Arquitetura de produção
+Arquitetura de produção — pronta para nuvem (Docker / Railway / Render / Fly.io)
 """
 
 import os
@@ -24,24 +24,28 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 
-# Configuração de logging
+# ─── Configuração de logging (stdout-only para nuvem) ─────────────────────────
+# Em nuvem, não gravamos em arquivo — apenas stdout/stderr (coletado pelo runtime)
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-    handlers=[
-        logging.FileHandler("pdf_tools/pdf_tools.log", encoding="utf-8"),
-        logging.StreamHandler()
-    ]
+    handlers=[logging.StreamHandler()]
 )
 logger = logging.getLogger("pdf_tools")
 
 # ─── Diretórios ──────────────────────────────────────────────────────────────
-BASE_DIR = Path("pdf_tools")
+# PDF_TOOLS_DATA_DIR permite sobrescrever via variável de ambiente.
+# Padrão na nuvem: /tmp/pdf_tools  (filesystem efêmero é suficiente para arquivos temporários)
+# Padrão local:    ./pdf_tools
+_DATA_DIR = os.getenv("PDF_TOOLS_DATA_DIR", "/tmp/pdf_tools" if os.getenv("PORT") else "pdf_tools")
+BASE_DIR   = Path(_DATA_DIR)
 UPLOAD_DIR = BASE_DIR / "uploads"
 OUTPUT_DIR = BASE_DIR / "outputs"
-STATIC_DIR = BASE_DIR / "static"
 
-for d in [UPLOAD_DIR, OUTPUT_DIR, STATIC_DIR]:
+# Static files ficam sempre ao lado deste script — independente de onde o processo roda
+STATIC_DIR = Path(__file__).parent / "static"
+
+for d in [UPLOAD_DIR, OUTPUT_DIR]:
     d.mkdir(parents=True, exist_ok=True)
 
 # ─── Configurações ────────────────────────────────────────────────────────────
@@ -734,14 +738,18 @@ async def pdf_info(
 # ═══════════════════════════════════════════════════════════════════════════════
 # SERVIR FRONTEND ESTÁTICO
 # ═══════════════════════════════════════════════════════════════════════════════
-app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+# Servir arquivos estáticos apenas se o diretório existir (evita erro no boot)
+if STATIC_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+else:
+    logger.warning(f"Diretório de estáticos não encontrado: {STATIC_DIR}")
 
 
 @app.get("/")
 async def serve_frontend():
     index = STATIC_DIR / "index.html"
     if not index.exists():
-        raise HTTPException(404, "Frontend não encontrado")
+        raise HTTPException(404, "Frontend não encontrado. Verifique se o diretório 'static/' existe.")
     return FileResponse(str(index))
 
 
@@ -752,10 +760,12 @@ async def health():
 
 if __name__ == "__main__":
     import uvicorn
+    # A variável de ambiente PORT é usada por Railway, Render, Heroku, Fly.io, etc.
+    port = int(os.getenv("PORT", 8765))
     uvicorn.run(
         "backend:app",
         host="0.0.0.0",
-        port=8765,
+        port=port,
         reload=False,
         workers=1,
         timeout_keep_alive=300,
